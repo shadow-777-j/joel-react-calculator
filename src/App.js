@@ -163,7 +163,7 @@ export default function Calculator() {
   const [quantumMode, setQuantumMode] = useState("default"); 
   const [pressTime, setPressTime] = useState(0);
 
-  // 🆕 FIXED: Pointing loops back straight into your clean local asset directories
+  // Reusable audio tracks reading out of clean local public directories
   const [clickAudio] = useState(() => new Audio("/click.mp3"));
   const [forestTrack] = useState(() => { 
     const a = new Audio("/forest.mp3"); 
@@ -596,8 +596,13 @@ export default function Calculator() {
 
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <span style={{ color: t.brandText, fontSize: "13px", fontWeight: "800", letterSpacing: "1px", fontFamily: "system-ui, sans-serif", textShadow: t.brandShadow, opacity: 0.9 }}>RDJ-3000</span>
+            {/* 🆕 FIXED: Touch events call e.preventDefault() to block ghost clicks entirely on mobile interfaces */}
             <button
-              onMouseDown={handleQuantumPressStart} onMouseUp={handleQuantumPressEnd} onMouseLeave={() => setPressTime(0)} onTouchStart={handleQuantumPressStart} onTouchEnd={handleQuantumPressEnd}
+              onMouseDown={handleQuantumPressStart} 
+              onMouseUp={handleQuantumPressEnd} 
+              onMouseLeave={() => setPressTime(0)} 
+              onTouchStart={(e) => { e.preventDefault(); handleQuantumPressStart(); }} 
+              onTouchEnd={(e) => { e.preventDefault(); handleQuantumPressEnd(); }}
               style={{ width: "28px", height: "28px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", userSelect: "none", transition: "all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1)", ...getQuantumBtnStyle() }}
             >
               {getQuantumIcon()}

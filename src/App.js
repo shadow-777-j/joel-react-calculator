@@ -1,132 +1,680 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import AmbientGlowBg from "./AmbientGlowBg"; 
+import ConstellationBg from "./ConstellationBg"; 
+import LeafWindBg from "./LeafWindBg"; 
+import RainBg from "./RainBg";         
 
-// 1. Button Styles Object (keeps our UI looking clean)
-const btnStyles = {
-  base: {
+// 1. Premium 3D Skeuomorphic Theme Palettes
+const themes = {
+  light: {
+    bodyBg: "#cbd5e1",
+    calcBg: "linear-gradient(145deg, #ffffff 0%, #f1f5f9 30%, #e2e8f0 70%, #cbd5e1 100%)",         
+    calcBorder: "1px solid #94a3b8",
+    controlGroupBorder: "1px solid #94a3b8", 
+    
+    // 3D Milled Recess Screen Bezel Styles
+    displayBg: "linear-gradient(180deg, #0f172a 0%, #1e293b 100%)",      
+    displayBorderTop: "3px solid #475569",    
+    displayBorderLeft: "2px solid #475569",   
+    displayBorderBottom: "2px solid #ffffff", 
+    displayBorderRight: "2px solid #e2e8f0",
+    displayText: "#38bdf8", 
+    
+    brandText: "#475569",
+    brandShadow: "0px 1px 0px #ffffff", 
+    controlText: "#64748b",
+    
+    // Mechanical Key Caps Styles & Layered Under-Shadows
+    btnNumBg: "linear-gradient(180deg, #334155 0%, #1e293b 100%)",       
+    btnNumText: "#ffffff",
+    btnNumShadow: "0px 4px 0px #0f172a, 0px 5px 8px rgba(0,0,0,0.2)",
+
+    btnFuncBg: "linear-gradient(180deg, #e2e8f0 0%, #cbd5e1 100%)",      
+    btnFuncText: "#0f172a",
+    btnFuncShadow: "0px 4px 0px #94a3b8, 0px 5px 8px rgba(0,0,0,0.15)",
+
+    btnCheckBg: "linear-gradient(180deg, #4b5563 0%, #374151 100%)",
+    btnCheckText: "#ffffff",
+    btnCheckShadow: "0px 4px 0px #111827, 0px 5px 8px rgba(0,0,0,0.15)",
+
+    btnOpBg: "linear-gradient(180deg, #ffb03a 0%, #ff9500 100%)",        
+    btnOpText: "#ffffff",
+    btnOpShadow: "0px 4px 0px #b45309, 0px 5px 8px rgba(0,0,0,0.2)",
+    
+    shadow: "0px 30px 60px rgba(15,23,42,0.3), inset 0px 3px 0px #ffffff, inset 0px -4px 10px rgba(0,0,0,0.15)"
+  },
+  dark: {
+    bodyBg: "#020617",
+    calcBg: "linear-gradient(145deg, #1e293b 0%, #0f172a 70%, #020617 100%)",         
+    calcBorder: "1px solid #334155",
+    controlGroupBorder: "1px solid #334155", 
+    
+    // Stealth Screen Frame Integration
+    displayBg: "linear-gradient(180deg, #020617 0%, #0f172a 100%)",
+    displayBorderTop: "2px solid #020617",
+    displayBorderLeft: "2px solid #020617",
+    displayBorderBottom: "1px solid #334155",
+    displayBorderRight: "1px solid #334155",
+    displayText: "#34d399", 
+    
+    brandText: "#94a3b8",
+    brandShadow: "0px -1px 0px rgba(0,0,0,0.8)", 
+    controlText: "#64748b",
+    
+    // High-Contrast Dark Mechanical Buttons
+    btnNumBg: "linear-gradient(180deg, #334155 0%, #1e293b 100%)",
+    btnNumText: "#ffffff",
+    btnNumShadow: "0px 4px 0px #090d16, 0px 6px 10px rgba(0,0,0,0.5)",
+
+    btnFuncBg: "linear-gradient(180deg, #475569 0%, #334155 100%)", 
+    btnFuncText: "#ffffff", 
+    btnFuncShadow: "0px 4px 0px #1e293b, 0px 6px 10px rgba(0,0,0,0.4)",
+
+    btnCheckBg: "linear-gradient(180deg, #1e293b 0%, #0f172a 100%)",
+    btnCheckText: "#34d399", 
+    btnCheckShadow: "0px 4px 0px #020617, 0px 6px 10px rgba(0,0,0,0.5)",
+
+    btnOpBg: "linear-gradient(180deg, #f97316 0%, #ea580c 100%)",   
+    btnOpText: "#ffffff",
+    btnOpShadow: "0px 4px 0px #7c2d12, 0px 6px 10px rgba(0,0,0,0.5)",
+    
+    shadow: "0px 30px 60px rgba(0,0,0,0.7), inset 0px 1px 2px rgba(255,255,255,0.1), inset 0px -5px 12px rgba(0,0,0,0.5)"
+  }
+};
+
+// 2. High-Fidelity 3D Button Component
+function Btn({ label, onClick, variant = "num", themeStyles, gridSpan = "auto" }) {
+  let bg, color, baseShadow;
+
+  if (variant === "func") {
+    bg = themeStyles.btnFuncBg;
+    color = themeStyles.btnFuncText;
+    baseShadow = themeStyles.btnFuncShadow;
+  } else if (variant === "op") {
+    bg = themeStyles.btnOpBg;
+    color = themeStyles.btnOpText;
+    baseShadow = themeStyles.btnOpShadow;
+  } else if (variant === "check") {
+    bg = themeStyles.btnCheckBg;
+    color = themeStyles.btnCheckText;
+    baseShadow = themeStyles.btnCheckShadow;
+  } else {
+    bg = themeStyles.btnNumBg;
+    color = themeStyles.btnNumText;
+    baseShadow = themeStyles.btnNumShadow;
+  }
+
+  const fontSize = label.length > 3 ? "13px" : (variant === "check" || label === "Poly" ? "15px" : "20px");
+
+  const style = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    height: "70px",
-    width: "70px",
-    borderRadius: "35px",
-    fontSize: "24px",
-    fontWeight: "500",
+    height: "50px",
+    width: "100%", 
+    gridColumn: gridSpan,
+    borderRadius: "18px", 
+    fontSize: fontSize,
+    fontWeight: "700",
     cursor: "pointer",
-    border: "none",
-    transition: "opacity 0.1s",
+    border: "1px solid rgba(0,0,0,0.15)",
+    backgroundColor: "transparent",
+    backgroundImage: bg,
+    color: color,
+    boxShadow: baseShadow,
+    transform: "translateY(0px)",
+    transition: "transform 0.04s ease, box-shadow 0.04s ease",
     fontFamily: "inherit",
-  },
-  func: { backgroundColor: "#a5a5a5", color: "#1c1c1c" },
-  op: { backgroundColor: "#ff9f0a", color: "#fff" },
-  num: { backgroundColor: "#333333", color: "#fff" },
-  zero: { backgroundColor: "#333333", color: "#fff", width: "155px", borderRadius: "35px", justifyContent: "flex-start", paddingLeft: "25px" }
-};
-
-// 2. The Reusable Button Component (Child Component)
-function Btn({ label, onClick, variant = "num" }) {
-  const style = {
-    ...btnStyles.base,
-    ...btnStyles[variant]
   };
 
   return (
-    <button style={style} onClick={() => onClick(label)}>
+    <button 
+      className="calc-btn"
+      style={style} 
+      onClick={() => onClick(label)}
+      onMouseDown={(e) => { 
+        e.target.style.transform = "translateY(3px)"; 
+        e.target.style.boxShadow = "0px 1px 0px rgba(0,0,0,0.5), inset 0px 2px 4px rgba(0,0,0,0.2)"; 
+      }}
+      onMouseUp={(e) => { e.target.style.transform = "translateY(0px)"; e.target.style.boxShadow = baseShadow; }}
+      onMouseLeave={(e) => { e.target.style.transform = "translateY(0px)"; e.target.style.boxShadow = baseShadow; }}
+    >
       {label}
     </button>
   );
 }
 
-// 3. The Main Calculator Component (Parent Component)
+// 3. Main Hardware Component
 export default function Calculator() {
-  // State variables to remember the current display, the previous number, and the active mathematical operation
   const [display, setDisplay] = useState("0");
-  const [prevValue, setPrevValue] = useState(null);
-  const [operation, setOperation] = useState(null);
   const [resetOnNextInput, setResetOnNextInput] = useState(false);
+  const [history, setHistory] = useState([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
 
-  // Function to handle number inputs
+  const [polyMode, setPolyMode] = useState(null); 
+  const [polyA, setPolyA] = useState(null);
+  const [polyB, setPolyB] = useState(null);
+
+  const [isMuted, setIsMuted] = useState(false);
+  const [currentTheme, setCurrentTheme] = useState("light");
+  const [iconRotation, setIconRotation] = useState(0);
+  const [solarBars, setSolarBars] = useState(4);
+
+  const [quantumMode, setQuantumMode] = useState("default"); 
+  const [pressTime, setPressTime] = useState(0);
+
+  // Universal Public Database Audio Assets
+  const [clickAudio] = useState(() => new Audio("https://upload.wikimedia.org/wikipedia/commons/3/34/Click_Sound_Effect.mp3"));
+  const [forestTrack] = useState(() => { 
+    const a = new Audio("https://upload.wikimedia.org/wikipedia/commons/d/d0/Bird_Chirping_Sound_Effect.mp3"); 
+    a.loop = true; return a; 
+  });
+  const [rainTrack] = useState(() => { 
+    const a = new Audio("https://upload.wikimedia.org/wikipedia/commons/8/87/Rain_on_roof.mp3"); 
+    a.loop = true; return a; 
+  });
+
+  const t = themes[currentTheme];
+
+  // Global Audio Switch State Controller Loop
+  useEffect(() => {
+    if (isMuted || quantumMode === "killed" || quantumMode === "default") {
+      forestTrack.pause();
+      rainTrack.pause();
+    } else {
+      if (quantumMode === "forest") {
+        rainTrack.pause();
+        forestTrack.play().catch(e => console.log("Audio pipeline waiting for gesture:", e));
+      } else if (quantumMode === "rain") {
+        forestTrack.pause();
+        rainTrack.play().catch(e => console.log("Audio pipeline waiting for gesture:", e));
+      }
+    }
+  }, [quantumMode, isMuted, forestTrack, rainTrack]);
+
+  useEffect(() => {
+    return () => {
+      forestTrack.pause();
+      rainTrack.pause();
+    };
+  }, [forestTrack, rainTrack]);
+
+  useEffect(() => {
+    const updateSolarPower = () => {
+      const hours = new Date().getHours();
+      if (hours >= 6 && hours < 12) setSolarBars(4);       
+      else if (hours >= 12 && hours < 16) setSolarBars(3);  
+      else if (hours >= 16 && hours < 19) setSolarBars(2);  
+      else setSolarBars(0);                                 
+    };
+    updateSolarPower();
+    const interval = setInterval(updateSolarPower, 60000); 
+    return () => clearInterval(interval);
+  }, []);
+
+  const toggleTheme = () => {
+    playClickSound();
+    setIconRotation(prev => prev + 360);
+    setCurrentTheme(prev => (prev === "light" ? "dark" : "light"));
+  };
+
+  const playClickSound = () => {
+    if (isMuted) return;
+    clickAudio.currentTime = 0;
+    clickAudio.play().catch(err => console.log("Audio block context caught:", err));
+  };
+
+  const handleQuantumPressStart = () => {
+    setPressTime(Date.now());
+  };
+
+  const handleQuantumPressEnd = () => {
+    if (!pressTime) return;
+    const duration = Date.now() - pressTime;
+    setPressTime(0);
+
+    if (duration >= 5000) {
+      setQuantumMode("rain");
+      forestTrack.pause();
+      if (!isMuted) {
+        rainTrack.currentTime = 0;
+        rainTrack.play().then(() => console.log("Storm Synchronized")).catch(e => console.log("Audio error caught:", e));
+      }
+      return;
+    }
+
+    if (duration >= 3000) {
+      setQuantumMode("forest");
+      rainTrack.pause();
+      if (!isMuted) {
+        forestTrack.currentTime = 0;
+        forestTrack.play().then(() => console.log("Forest Synchronized")).catch(e => console.log("Audio error caught:", e));
+      }
+      return;
+    }
+
+    if (quantumMode === "forest" || quantumMode === "rain" || quantumMode === "default") {
+      setQuantumMode("killed"); 
+      forestTrack.pause();
+      rainTrack.pause();
+    } else {
+      setQuantumMode("default"); 
+    }
+    playClickSound();
+  };
+
+  const handleNumberInput = (num) => { playClickSound(); handleNumber(num); };
+  const handleOperationInput = (op) => { playClickSound(); handleOperation(op); };
+  const handleClearInput = () => { playClickSound(); clearAll(); };
+  const handleEqualInput = () => { playClickSound(); calculate(); };
+
+  const evaluateExpression = (expr) => {
+    let sanitized = expr.replace(/×/g, "*").replace(/÷/g, "/").replace(/²/g, "**2");
+    const safeRegex = /^[0-9+\-*/().\s**]+$/;
+    if (!safeRegex.test(sanitized)) return "Error";
+    try {
+      // eslint-disable-next-line no-new-func
+      const result = new Function(`return (${sanitized})`)();
+      if (result === Infinity || isNaN(result)) return "Error";
+      return String(result);
+    } catch (e) { return "Error"; }
+  };
+
   const handleNumber = (num) => {
-    if (display === "0" || resetOnNextInput) {
+    const prompts = ["a = ?", "b = ?", "c = ?"];
+    if (display === "0" || resetOnNextInput || historyIndex !== -1 || prompts.includes(display) || display === "Error") {
       setDisplay(num);
       setResetOnNextInput(false);
+      setHistoryIndex(-1); 
     } else {
-      setDisplay(display + num);
+      const lastChar = display.slice(-1);
+      if (lastChar === ")" || lastChar === "²") setDisplay(display + " × " + num);
+      else setDisplay(display + num);
     }
   };
 
-  // Function to handle operations (+, -, *, /)
   const handleOperation = (op) => {
-    setPrevValue(parseFloat(display));
-    setOperation(op);
+    const prompts = ["a = ?", "b = ?", "c = ?"];
+    if (prompts.includes(display) || display === "Error" || display.includes("x")) return;
+    const trimmed = display.trim();
+    if (["+", "-", "×", "÷"].includes(trimmed.slice(-1))) {
+      const tokens = trimmed.split(/\s+/);
+      tokens[tokens.length - 1] = op;
+      setDisplay(tokens.join(" ") + " ");
+    } else {
+      setDisplay(display + " " + op + " ");
+    }
+    setResetOnNextInput(false);
+    setHistoryIndex(-1);
+  };
+
+  const handleParenthesis = (p) => {
+    playClickSound();
+    const prompts = ["a = ?", "b = ?", "c = ?"];
+    if (prompts.includes(display) || display === "Error") return;
+
+    if (display === "0" || resetOnNextInput || historyIndex !== -1) {
+      setDisplay(p);
+      setResetOnNextInput(false);
+      setHistoryIndex(-1);
+    } else {
+      const lastChar = display.slice(-1);
+      if (p === "(" && /[0-9)³²]/.test(lastChar)) setDisplay(display + " × (");
+      else setDisplay(display + p);
+    }
+  };
+
+  const handleSquare = () => {
+    playClickSound();
+    const prompts = ["a = ?", "b = ?", "c = ?"];
+    if (prompts.includes(display) || display === "Error" || display === "0") return;
+    if (["+", "-", "×", "÷", "(", " "].includes(display.slice(-1))) return;
+    setDisplay(display + "²");
+    setResetOnNextInput(false);
+    setHistoryIndex(-1);
+  };
+
+  const handleSquareRoot = () => {
+    playClickSound();
+    const prompts = ["a = ?", "b = ?", "c = ?"];
+    if (prompts.includes(display) || display === "Error") return;
+    const currentTotal = parseFloat(evaluateExpression(display));
+    if (isNaN(currentTotal) || currentTotal < 0) { setDisplay("Error"); } 
+    else {
+      const result = Math.sqrt(currentTotal);
+      setDisplay(String(result));
+      setHistory(prev => [...prev, `√(${display}) = ${result}`]);
+      setHistoryIndex(-1);
+    }
     setResetOnNextInput(true);
   };
 
-  // Function to calculate the final result (=)
-  const calculate = () => {
-    if (!operation || prevValue === null) return;
-    
-    const current = parseFloat(display);
-    let result = 0;
+  const startPolynomialSolver = () => {
+    playClickSound(); setPolyMode("a"); setDisplay("a = ?"); setResetOnNextInput(true);
+  };
 
-    switch (operation) {
-      case "+": result = prevValue + current; break;
-      case "-": result = prevValue - current; break;
-      case "×": result = prevValue * current; break;
-      case "÷": result = current !== 0 ? prevValue / current : "Error"; break;
-      default: return;
+  const handleBackspace = () => {
+    playClickSound();
+    const prompts = ["a = ?", "b = ?", "c = ?"];
+    if (prompts.includes(display) || historyIndex !== -1 || display === "Error") return;
+    const trimmed = display.trim();
+    const tokens = trimmed.split(/\s+/);
+    if (["+", "-", "×", "÷"].includes(tokens[tokens.length - 1])) {
+      tokens.pop();
+      const nextString = tokens.join(" ");
+      setDisplay(nextString === "" ? "0" : nextString);
+    } else {
+      if (display.length > 1) {
+        let updated = display.slice(0, -1);
+        if (updated.slice(-1) === " ") updated = updated.trim();
+        setDisplay(updated === "" ? "0" : updated);
+      } else { setDisplay("0"); }
+    }
+  };
+
+  const calculate = () => {
+    if (polyMode === "a") { setPolyA(parseFloat(display)); setPolyMode("b"); setDisplay("b = ?"); setResetOnNextInput(true); return; }
+    if (polyMode === "b") { setPolyB(parseFloat(display)); setPolyMode("c"); setDisplay("c = ?"); setResetOnNextInput(true); return; }
+    if (polyMode === "c") {
+      const c = parseFloat(display); const a = polyA; const b = polyB;
+      if (a === 0) { setDisplay("Invalid (a=0)"); setPolyMode(null); return; }
+      const discriminant = b * b - 4 * a * c;
+      let resultStr = "";
+      if (discriminant >= 0) {
+        const root1 = (-b + Math.sqrt(discriminant)) / (2 * a);
+        const root2 = (-b - Math.sqrt(discriminant)) / (2 * a);
+        resultStr = root1 === root2 ? `x = ${root1}` : `x1=${root1.toFixed(2)}, x2=${root2.toFixed(2)}`;
+      } else {
+        const realPart = (-b / (2 * a)).toFixed(2); const imagPart = (Math.sqrt(-discriminant) / (2 * a)).toFixed(2);
+        resultStr = `x1=${realPart}+${imagPart}i, x2=${realPart}-${imagPart}i`;
+      }
+      setDisplay(resultStr);
+      setHistory(prev => [...prev, `${a}x² + ${b}x + ${c} = 0 → ${resultStr}`]);
+      setPolyMode(null); setPolyA(null); setPolyB(null); setHistoryIndex(-1); setResetOnNextInput(true); return;
     }
 
-    setDisplay(String(result));
-    setPrevValue(null);
-    setOperation(null);
-    setResetOnNextInput(true);
+    const currentExpression = display;
+    const resultStr = evaluateExpression(currentExpression);
+    setDisplay(resultStr);
+    if (resultStr !== "Error" && currentExpression !== resultStr) {
+      setHistory(prev => [...prev, `${currentExpression.trim()} = ${resultStr}`]);
+    }
+    setHistoryIndex(-1); setResetOnNextInput(true);
   };
 
-  // Function to reset everything (AC)
-  const clearAll = () => {
-    setDisplay("0");
-    setPrevValue(null);
-    setOperation(null);
-    setResetOnNextInput(false);
+  const handleHistoryUp = () => {
+    playClickSound(); if (history.length === 0) return;
+    let newIndex = historyIndex === -1 ? history.length - 1 : historyIndex - 1;
+    if (newIndex >= 0) { setHistoryIndex(newIndex); setDisplay(history[newIndex]); }
   };
+
+  const handleHistoryDown = () => {
+    playClickSound(); if (history.length === 0 || historyIndex === -1) return;
+    let newIndex = historyIndex + 1;
+    if (newIndex < history.length) { setHistoryIndex(newIndex); setDisplay(history[newIndex]); } 
+    else { setHistoryIndex(-1); setDisplay("0"); }
+  };
+
+  const clearAll = () => {
+    setDisplay("0"); setResetOnNextInput(false); setPolyMode(null); setPolyA(null); setPolyB(null); setHistoryIndex(-1);
+  };
+
+  const getQuantumIcon = () => {
+    if (quantumMode === "forest") {
+      return <span style={{ display: "inline-block", animation: "swayLeaf 2s infinite ease-in-out", fontSize: "16px" }}>🍃</span>;
+    }
+    if (quantumMode === "rain") {
+      return <span style={{ display: "inline-block", animation: "bounceDrop 1.2s infinite ease-in-out", fontSize: "15px" }}>💧</span>;
+    }
+    
+    const strokeColor = quantumMode === "killed" 
+      ? (currentTheme === "light" ? "#94a3b8" : "#475569") 
+      : (currentTheme === "light" ? "#334155" : "#cbd5e1");
+      
+    return (
+      <svg viewBox="0 0 24 24" width="18" height="18" style={{ animation: quantumMode === "killed" ? "none" : "spinAtom 6s infinite linear", display: "block" }}>
+        <circle cx="12" cy="12" r="1.8" fill={strokeColor} />
+        <ellipse cx="12" cy="12" rx="9" ry="3" fill="none" stroke={strokeColor} strokeWidth="1.5" />
+        <ellipse cx="12" cy="12" rx="9" ry="3" fill="none" stroke={strokeColor} strokeWidth="1.5" transform="rotate(60 12 12)" />
+        <ellipse cx="12" cy="12" rx="9" ry="3" fill="none" stroke={strokeColor} strokeWidth="1.5" transform="rotate(120 12 12)" />
+      </svg>
+    );
+  };
+
+  const getQuantumBtnStyle = () => {
+    const isLight = currentTheme === "light";
+    const baseCircle = {
+      width: "32px",
+      height: "32px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      cursor: "pointer",
+      userSelect: "none",
+      borderRadius: "50%",
+      transition: "all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)"
+    };
+
+    if (quantumMode === "forest") {
+      return {
+        ...baseCircle,
+        background: "linear-gradient(135deg, #047857 0%, #10b981 100%)",
+        border: "1px solid #065f46",
+        boxShadow: "0px 0px 14px rgba(16,185,129,0.85), inset 0px 1px 2px rgba(255,255,255,0.6)",
+        transform: "scale(1.06)"
+      };
+    }
+    if (quantumMode === "rain") {
+      return {
+        ...baseCircle,
+        background: "linear-gradient(135deg, #0284c7 0%, #0369a1 100%)", 
+        border: "1px solid #075985",
+        boxShadow: "0px 0px 14px rgba(14,165,233,0.75), inset 0px 1px 2px rgba(255,255,255,0.5)",
+        transform: "scale(1.06)"
+      };
+    }
+    
+    return {
+      ...baseCircle,
+      background: isLight 
+        ? "linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%)" 
+        : "linear-gradient(180deg, #334155 0%, #1e293b 100%)",
+      border: "1px solid rgba(0,0,0,0.15)",
+      boxShadow: quantumMode === "killed"
+        ? "inset 0px 2px 3px rgba(0,0,0,0.2)"
+        : (isLight ? "0px 2px 3px rgba(0,0,0,0.1), inset 0px 1px 0px #ffffff" : "0px 2px 3px rgba(0,0,0,0.3)")
+    };
+  };
+
+  // Complete Physical Keyboard Event Capture Board System
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (/[0-9]/.test(e.key)) { 
+        e.preventDefault(); 
+        handleNumberInput(e.key); 
+      }
+      else if (e.key === "+") { e.preventDefault(); handleOperationInput("+"); }
+      else if (e.key === "-") { e.preventDefault(); handleOperationInput("-"); }
+      else if (e.key === "*") { e.preventDefault(); handleOperationInput("×"); }
+      else if (e.key === "/") { e.preventDefault(); handleOperationInput("÷"); }
+      else if (e.key === "9" && e.shiftKey) { e.preventDefault(); handleParenthesis("("); }
+      else if (e.key === "0" && e.shiftKey) { e.preventDefault(); handleParenthesis(")"); }
+      else if (e.key === "Enter" || e.key === "=") { e.preventDefault(); handleEqualInput(); }
+      else if (e.key === "Backspace") { e.preventDefault(); handleBackspace(); }
+      else if (e.key === "Escape") { e.preventDefault(); handleClearInput(); }
+      else if (e.key === ".") { 
+        e.preventDefault(); 
+        playClickSound(); 
+        if (!display.includes(".")) setDisplay(prev => prev + "."); 
+      }
+      else if (e.key === "ArrowUp") { e.preventDefault(); handleHistoryUp(); }
+      else if (e.key === "ArrowDown") { e.preventDefault(); handleHistoryDown(); }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+    
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [display, polyMode, polyA, polyB, history, historyIndex, isMuted, resetOnNextInput, currentTheme, quantumMode]);
 
   return (
-    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", backgroundColor: "#000" }}>
-      <div style={{ backgroundColor: "#000", width: "320px", padding: "20px", borderRadius: "20px", boxShadow: "0px 4px 20px rgba(255,255,255,0.1)" }}>
+    <div className="calc-outer" style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", backgroundColor: t.bodyBg, transition: "background-color 0.3s", overflow: "hidden", position: "relative" }}>
+      <style>{`
+        @keyframes spinAtom { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes swayLeaf { 0%, 100% { transform: rotate(-15deg); } 50% { transform: rotate(20deg) scale(1.08); } }
+        @keyframes bounceDrop { 0%, 100% { transform: translateY(0) scaleY(1); } 50% { transform: translateY(3px) scaleY(0.88) scaleX(1.06); } }
+        @keyframes blinkCursor { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* 🆕 HIGH-FIDELITY ANDROID RESPONSIVE SCALE ENGINE Overrides */
+        @media (max-width: 500px) {
+          .calc-outer {
+            padding: 0 !important;
+          }
+          .calc-card {
+            width: 100% !important;
+            max-width: 100% !important;
+            height: 100vh !important;
+            border-radius: 0px !important;
+            border: none !important;
+            box-shadow: none !important;
+            padding: 16px 14px !important;
+            box-sizing: border-box !important;
+            display: flex !important;
+            flex-direction: column !important;
+          }
+          .lcd-screen {
+            height: 90px !important;
+            max-height: 90px !important;
+            font-size: 42px !important;
+            margin-top: auto !important; /* Forces layout to stack flush from base up */
+            margin-bottom: 18px !important;
+          }
+          .keypad-matrix {
+            display: grid !important;
+            grid-template-rows: repeat(6, 1fr) !important; /* Divides keys into equal mobile row blocks */
+            gap: 12px 10px !important;
+            height: 62vh !important; /* Fills primary thumb reach viewport percentage */
+          }
+          .calc-btn {
+            height: 100% !important;
+            font-size: 24px !important;
+            border-radius: 15px !important;
+            touch-action: manipulation !important; /* Disables double-tap zoom latency */
+          }
+          .system-zone {
+            gap: 10px !important;
+            padding: 6px 4px !important;
+          }
+        }
+      `}</style>
+
+      {/* State-Dependent Environment Background Router Matrix */}
+      {quantumMode === "default" && <AmbientGlowBg currentTheme={currentTheme} />}
+      {quantumMode === "default" && <ConstellationBg currentTheme={currentTheme} />}
+      {quantumMode === "forest" && <LeafWindBg currentTheme={currentTheme} />}
+      {quantumMode === "rain" && <RainBg currentTheme={currentTheme} />}
+
+      <div className="calc-card" style={{ background: t.calcBg, width: "330px", padding: "28px 22px", borderRadius: "32px", border: t.calcBorder, boxShadow: t.shadow, transition: "all 0.3s", zIndex: 1, position: "relative" }}>
         
-        {/* The Display Screen */}
-        <div style={{ color: "#fff", fontSize: "48px", textAlign: "right", paddingRight: "10px", marginBottom: "20px", overflow: "hidden" }}>
-          {display}
+        {/* HARDWARE CIRCUIT LED INDICATOR */}
+        {(quantumMode === "forest" || quantumMode === "rain") && (
+          <div style={{
+            position: "absolute", top: "8px", right: "12px", width: "7px", height: "7px", borderRadius: "50%",
+            backgroundColor: quantumMode === "forest" ? "#10b981" : "#3b82f6",
+            boxShadow: quantumMode === "forest" ? "0px 0px 8px #10b981, inset 0px 1px 1px rgba(255,255,255,0.6)" : "0px 0px 8px #3b82f6, inset 0px 1px 1px rgba(255,255,255,0.6)",
+            transition: "all 0.3s ease"
+          }} />
+        )}
+
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px" }}>
+          <span style={{ color: t.brandText, fontSize: "13px", fontWeight: "800", letterSpacing: "1.5px", fontFamily: "system-ui, sans-serif", textShadow: t.brandShadow, opacity: 0.9 }}>CALCULATOR</span>
+          <div style={{ display: "flex", gap: "4px", backgroundColor: currentTheme === "light" ? "#2d221f" : "#020617", padding: "6px 12px", borderRadius: "5px", border: "1px solid rgba(0,0,0,0.2)", boxShadow: "inset 0px 2px 4px rgba(0,0,0,0.4)" }}>
+            {[1, 2, 3, 4].map((barIndex) => (
+              <div key={barIndex} style={{ width: "11px", height: "18px", backgroundColor: barIndex <= solarBars ? "#10b981" : "rgba(255,255,255,0.05)", transition: "background-color 0.5s ease", borderRight: "1px solid rgba(0,0,0,0.15)" }} />
+            ))}
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <span style={{ color: t.brandText, fontSize: "13px", fontWeight: "800", letterSpacing: "1px", fontFamily: "system-ui, sans-serif", textShadow: t.brandShadow, opacity: 0.9 }}>RDJ-3000</span>
+            <button
+              onMouseDown={handleQuantumPressStart} onMouseUp={handleQuantumPressEnd} onMouseLeave={() => setPressTime(0)} onTouchStart={handleQuantumPressStart} onTouchEnd={handleQuantumPressEnd}
+              style={{ width: "28px", height: "28px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", userSelect: "none", transition: "all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1)", ...getQuantumBtnStyle() }}
+            >
+              {getQuantumIcon()}
+            </button>
+          </div>
         </div>
 
-        {/* The Button Grid Layout */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "12px" }}>
-          <Btn label="AC" variant="func" onClick={clearAll} />
-          <Btn label="+/-" variant="func" onClick={() => setDisplay(String(parseFloat(display) * -1))} />
-          <Btn label="%" variant="func" onClick={() => setDisplay(String(parseFloat(display) / 100))} />
-          <Btn label="÷" variant="op" onClick={handleOperation} />
-
-          <Btn label="7" onClick={handleNumber} />
-          <Btn label="8" onClick={handleNumber} />
-          <Btn label="9" onClick={handleNumber} />
-          <Btn label="×" variant="op" onClick={handleOperation} />
-
-          <Btn label="4" onClick={handleNumber} />
-          <Btn label="5" onClick={handleNumber} />
-          <Btn label="6" onClick={handleNumber} />
-          <Btn label="-" variant="op" onClick={handleOperation} />
-
-          <Btn label="1" onClick={handleNumber} />
-          <Btn label="2" onClick={handleNumber} />
-          <Btn label="3" onClick={handleNumber} />
-          <Btn label="+" variant="op" onClick={handleOperation} />
+        {/* ---📟 3D LCD SCREEN --- */}
+        <div className="lcd-screen" style={{ 
+          background: t.displayBg, color: t.displayText, fontSize: "32px", fontWeight: "600", fontFamily: "'Courier New', Courier, monospace",
+          display: "flex", justifyContent: "flex-end", alignItems: "center", padding: "0px 15px", borderRadius: "14px", marginBottom: "15px", height: "64px", maxHeight: "64px",
+          borderTop: t.displayBorderTop, borderLeft: t.displayBorderLeft, borderBottom: t.displayBorderBottom, borderRight: t.displayBorderRight,
+          boxShadow: "inset 0px 6px 12px rgba(0,0,0,0.95), 0px 1px 2px rgba(255,255,255,0.15)", textShadow: currentTheme === "light" ? "0px 0px 8px rgba(56,189,248,0.5)" : "0px 0px 8px rgba(52,211,153,0.5)",
+          whiteSpace: "nowrap", overflowX: "hidden", boxSizing: "border-box"
+        }}>
+          <span>{display}</span>
+          <span style={{
+            display: "inline-block", width: "3px", height: "22px", backgroundColor: t.displayText, marginLeft: "3px",
+            animation: "blinkCursor 1s steps(2, start) infinite", verticalAlign: "middle"
+          }} />
         </div>
 
-        {/* Bottom Row with wide zero button */}
-        <div style={{ display: "flex", gap: "12px", marginTop: "12px" }}>
-          <Btn label="0" variant="zero" onClick={handleNumber} />
-          <Btn label="." onClick={() => { if (!display.includes(".")) setDisplay(display + "."); }} />
-          <Btn label="=" variant="op" onClick={calculate} />
+        <div style={{ display: "flex", justifyContent: "flex-end", color: t.controlText, fontSize: "9px", fontWeight: "800", letterSpacing: "0.6px", marginBottom: "6px", paddingRight: "4px" }}>
+          CHECK i-CORRECT
+        </div>
+
+        {/* --- KEYPAD GRID MATRIX --- */}
+        <div className="keypad-matrix" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "14px 12px" }}>
+          <div className="system-zone" style={{
+            gridColumn: "span 4", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "12px", border: t.controlGroupBorder, padding: "8px 6px", borderRadius: "22px",
+            backgroundColor: currentTheme === "light" ? "rgba(0,0,0,0.02)" : "rgba(0,0,0,0.18)", boxShadow: "inset 0px 3px 6px rgba(0,0,0,0.15), 0px 1px 0px rgba(255,255,255,0.4)"
+          }}>
+            <Btn label="AC" variant="func" themeStyles={t} onClick={handleClearInput} />
+            <Btn label="DEL" variant="func" themeStyles={t} onClick={handleBackspace} />
+            <Btn label="▲" variant="check" themeStyles={t} onClick={handleHistoryUp} />
+            <Btn label="▼" variant="check" themeStyles={t} onClick={handleHistoryDown} />
+          </div>
+
+          <Btn label="+/-" variant="func" themeStyles={t} onClick={() => { playClickSound(); const tot = evaluateExpression(display); setDisplay(String(parseFloat(tot) * -1)); }} />
+          <Btn label="√" variant="func" themeStyles={t} onClick={handleSquareRoot} />
+          <Btn label="x²" variant="func" themeStyles={t} onClick={handleSquare} />
+          <Btn label="Poly" variant="func" themeStyles={t} onClick={startPolynomialSolver} />
+
+          <Btn label="(" variant="func" themeStyles={t} onClick={() => handleParenthesis("(")} />
+          <Btn label=")" variant="func" themeStyles={t} onClick={() => handleParenthesis(")")} />
+          <Btn label="%" variant="func" themeStyles={t} onClick={() => { playClickSound(); const tot = evaluateExpression(display); setDisplay(String(parseFloat(tot) / 100)); }} />
+          <Btn label="÷" variant="op" themeStyles={t} onClick={handleOperationInput} />
+
+          <Btn label="7" themeStyles={t} onClick={handleNumberInput} />
+          <Btn label="8" themeStyles={t} onClick={handleNumberInput} />
+          <Btn label="9" themeStyles={t} onClick={handleNumberInput} />
+          <Btn label="×" variant="op" themeStyles={t} onClick={handleOperationInput} />
+
+          <Btn label="4" themeStyles={t} onClick={handleNumberInput} />
+          <Btn label="5" themeStyles={t} onClick={handleNumberInput} />
+          <Btn label="6" themeStyles={t} onClick={handleNumberInput} />
+          <Btn label="-" variant="op" themeStyles={t} onClick={handleOperationInput} />
+
+          <Btn label="1" themeStyles={t} onClick={handleNumberInput} />
+          <Btn label="2" themeStyles={t} onClick={handleNumberInput} />
+          <Btn label="3" themeStyles={t} onClick={handleNumberInput} />
+          <Btn label="+" variant="op" themeStyles={t} onClick={handleOperationInput} />
+
+          <Btn label="0" themeStyles={t} gridSpan="span 2" onClick={handleNumberInput} />
+          <Btn label="." themeStyles={t} onClick={() => { playClickSound(); if (!display.includes(".")) setDisplay(prev => prev + "."); }} />
+          <Btn label="=" variant="op" themeStyles={t} onClick={handleEqualInput} />
+        </div>
+
+        {/* --- PANEL BASE UTILITY FOOTER --- */}
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "24px", marginTop: "22px", borderTop: `1px solid ${currentTheme === "light" ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.1)"}`, paddingTop: "14px" }}>
+          <button onClick={() => setIsMuted(!isMuted)} style={{ backgroundColor: "transparent", border: "none", color: t.controlText, fontSize: "14px", fontWeight: "700", cursor: "pointer", width: "110px", textAlign: "center" }}>
+            {isMuted ? "🔈 Muted" : "🔊 Sound On"}
+          </button>
+          <div style={{ width: "1px", height: "14px", backgroundColor: currentTheme === "light" ? "#cbd5e1" : "#475569" }} />
+          <button onClick={toggleTheme} style={{ backgroundColor: "transparent", border: "none", color: t.controlText, fontSize: "14px", fontWeight: "700", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", width: "110px" }}>
+            <span style={{ display: "inline-block", transform: `rotate(${iconRotation}deg)`, transition: "transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)", fontSize: "16px" }}>{currentTheme === "light" ? "🌙" : "☀️"}</span>Theme
+          </button>
         </div>
 
       </div>

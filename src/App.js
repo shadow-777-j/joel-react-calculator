@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import AmbientGlowBg from "./AmbientGlowBg"; 
 import ConstellationBg from "./ConstellationBg"; 
 import LeafWindBg from "./LeafWindBg"; 
@@ -144,7 +144,80 @@ function Btn({ label, onClick, variant = "num", themeStyles, gridSpan = "auto" }
   );
 }
 
-// 3. Main Hardware Component
+// 🆕 3. Hacking Matrix Binary Rain Engine Component
+function BinaryRainLoader() {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    let animationFrameId;
+
+    const resizeCanvas = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+
+    const fontSize = 16;
+    const columns = Math.floor(canvas.width / fontSize);
+    const rainDrops = Array(columns).fill(1);
+
+    const draw = () => {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.06)"; // Trail length fade rate
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.font = "bold " + fontSize + "px monospace";
+
+      for (let i = 0; i < rainDrops.length; i++) {
+        const text = Math.random() > 0.5 ? "1" : "0";
+        const x = i * fontSize;
+        const y = rainDrops[i] * fontSize;
+
+        // High-fidelity depth layers utilizing real cyber neon blue variants
+        if (Math.random() > 0.96) {
+          ctx.fillStyle = "#ffffff"; // Neon bright front tips
+        } else if (Math.random() > 0.4) {
+          ctx.fillStyle = "#38bdf8"; // Mid-tier glowing cyber cyan
+        } else {
+          ctx.fillStyle = "#0369a1"; // Hidden background trail streams
+        }
+
+        ctx.fillText(text, x, y);
+
+        if (y > canvas.height && Math.random() > 0.975) {
+          rainDrops[i] = 0;
+        }
+        rainDrops[i]++;
+      }
+    };
+
+    const interval = setInterval(draw, 30); // Hyper-smooth performance frame rate loop
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("resize", resizeCanvas);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        display: "block",
+        backgroundColor: "#000000"
+      }}
+    />
+  );
+}
+
+// 4. Main Hardware Component
 export default function Calculator() {
   const [display, setDisplay] = useState("0");
   const [resetOnNextInput, setResetOnNextInput] = useState(false);
@@ -163,7 +236,11 @@ export default function Calculator() {
   const [quantumMode, setQuantumMode] = useState("default"); 
   const [pressTime, setPressTime] = useState(0);
 
-  // Reusable audio tracks reading out of clean local public directories
+  // 🆕 Entry loader magic visibility state controls
+  const [showLoading, setShowLoading] = useState(true);
+  const [fadeLoading, setFadeLoading] = useState(false);
+
+  // Reusable audio tracks optimized for local public directories
   const [clickAudio] = useState(() => new Audio("/click.mp3"));
   const [forestTrack] = useState(() => { 
     const a = new Audio("/forest.mp3"); 
@@ -175,6 +252,19 @@ export default function Calculator() {
   });
 
   const t = themes[currentTheme];
+
+  // 🆕 Triggers the magic window dissolving transition sequence
+  useEffect(() => {
+    const fadeTimer = setTimeout(() => {
+      setFadeLoading(true); // Engages alpha channel drop wrapper
+      const removeTimer = setTimeout(() => {
+        setShowLoading(false); // Unmounts loader cleanly from execution stack
+      }, 800); 
+      return () => clearTimeout(removeTimer);
+    }, 2500); 
+
+    return () => clearTimeout(fadeTimer);
+  }, []);
 
   // Global Audio Switch State Controller Loop
   useEffect(() => {
@@ -596,7 +686,6 @@ export default function Calculator() {
 
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <span style={{ color: t.brandText, fontSize: "13px", fontWeight: "800", letterSpacing: "1px", fontFamily: "system-ui, sans-serif", textShadow: t.brandShadow, opacity: 0.9 }}>RDJ-3000</span>
-            {/* 🆕 FIXED: Touch events call e.preventDefault() to block ghost clicks entirely on mobile interfaces */}
             <button
               onMouseDown={handleQuantumPressStart} 
               onMouseUp={handleQuantumPressEnd} 
@@ -683,6 +772,23 @@ export default function Calculator() {
         </div>
 
       </div>
+
+      {/* 🆕 Full-Screen Intercepting Binary Loading Overlay Matrix */}
+      {showLoading && (
+        <div style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
+          zIndex: 99999,
+          pointerEvents: "none", // Bypasses click blocks during matrix animation stream
+          opacity: fadeLoading ? 0 : 1,
+          transition: "opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1)" // Smooth magical fade out reveal
+        }}>
+          <BinaryRainLoader />
+        </div>
+      )}
     </div>
   );
 }

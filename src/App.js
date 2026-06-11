@@ -163,14 +163,14 @@ export default function Calculator() {
   const [quantumMode, setQuantumMode] = useState("default"); 
   const [pressTime, setPressTime] = useState(0);
 
-  // Universal Public Database Audio Assets
-  const [clickAudio] = useState(() => new Audio("https://upload.wikimedia.org/wikipedia/commons/3/34/Click_Sound_Effect.mp3"));
+  // 🆕 FIXED: Pointing loops back straight into your clean local asset directories
+  const [clickAudio] = useState(() => new Audio("/click.mp3"));
   const [forestTrack] = useState(() => { 
-    const a = new Audio("https://upload.wikimedia.org/wikipedia/commons/d/d0/Bird_Chirping_Sound_Effect.mp3"); 
+    const a = new Audio("/forest.mp3"); 
     a.loop = true; return a; 
   });
   const [rainTrack] = useState(() => { 
-    const a = new Audio("https://upload.wikimedia.org/wikipedia/commons/8/87/Rain_on_roof.mp3"); 
+    const a = new Audio("/rain.mp3"); 
     a.loop = true; return a; 
   });
 
@@ -525,7 +525,7 @@ export default function Calculator() {
         @keyframes bounceDrop { 0%, 100% { transform: translateY(0) scaleY(1); } 50% { transform: translateY(3px) scaleY(0.88) scaleX(1.06); } }
         @keyframes blinkCursor { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-        /* 🆕 HIGH-FIDELITY ANDROID RESPONSIVE SCALE ENGINE Overrides */
+        /* HIGH-FIDELITY ANDROID RESPONSIVE SCALE ENGINE Overrides */
         @media (max-width: 500px) {
           .calc-outer {
             padding: 0 !important;
@@ -546,20 +546,20 @@ export default function Calculator() {
             height: 90px !important;
             max-height: 90px !important;
             font-size: 42px !important;
-            margin-top: auto !important; /* Forces layout to stack flush from base up */
+            margin-top: auto !important; 
             margin-bottom: 18px !important;
           }
           .keypad-matrix {
             display: grid !important;
-            grid-template-rows: repeat(6, 1fr) !important; /* Divides keys into equal mobile row blocks */
+            grid-template-rows: repeat(6, 1fr) !important; 
             gap: 12px 10px !important;
-            height: 62vh !important; /* Fills primary thumb reach viewport percentage */
+            height: 62vh !important; 
           }
           .calc-btn {
             height: 100% !important;
             font-size: 24px !important;
             border-radius: 15px !important;
-            touch-action: manipulation !important; /* Disables double-tap zoom latency */
+            touch-action: manipulation !important; 
           }
           .system-zone {
             gap: 10px !important;

@@ -104,7 +104,12 @@ function Btn({ label, onClick, variant = "num", themeStyles, gridSpan = "auto" }
     baseShadow = themeStyles.btnNumShadow;
   }
 
-  const fontSize = label.length > 3 ? "13px" : (variant === "check" || label === "Poly" ? "15px" : "20px");
+  let fontSize = "20px";
+  if (label.length > 3) {
+    fontSize = "13px";
+  } else if (variant === "check" || label === "Poly") {
+    fontSize = "15px";
+  }
 
   const style = {
     display: "flex",
@@ -131,27 +136,34 @@ function Btn({ label, onClick, variant = "num", themeStyles, gridSpan = "auto" }
     <button 
       className="calc-btn"
       style={style} 
-      onClick={() => onClick(label)}
+      onClick={() => {
+        onClick(label);
+      }}
       onMouseDown={(e) => { 
         e.target.style.transform = "translateY(3px)"; 
         e.target.style.boxShadow = "0px 1px 0px rgba(0,0,0,0.5), inset 0px 2px 4px rgba(0,0,0,0.2)"; 
       }}
-      onMouseUp={(e) => { e.target.style.transform = "translateY(0px)"; e.target.style.boxShadow = baseShadow; }}
-      onMouseLeave={(e) => { e.target.style.transform = "translateY(0px)"; e.target.style.boxShadow = baseShadow; }}
+      onMouseUp={(e) => { 
+        e.target.style.transform = "translateY(0px)"; 
+        e.target.style.boxShadow = baseShadow; 
+      }}
+      onMouseLeave={(e) => { 
+        e.target.style.transform = "translateY(0px)"; 
+        e.target.style.boxShadow = baseShadow; 
+      }}
     >
       {label}
     </button>
   );
 }
 
-// 🆕 3. Hacking Matrix Binary Rain Engine Component
+// 3. Hacking Matrix Binary Rain Engine Component
 function BinaryRainLoader() {
   const canvasRef = useRef(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
-    let animationFrameId;
 
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;
@@ -165,7 +177,7 @@ function BinaryRainLoader() {
     const rainDrops = Array(columns).fill(1);
 
     const draw = () => {
-      ctx.fillStyle = "rgba(0, 0, 0, 0.06)"; // Trail length fade rate
+      ctx.fillStyle = "rgba(0, 0, 0, 0.06)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       ctx.font = "bold " + fontSize + "px monospace";
@@ -175,13 +187,12 @@ function BinaryRainLoader() {
         const x = i * fontSize;
         const y = rainDrops[i] * fontSize;
 
-        // High-fidelity depth layers utilizing real cyber neon blue variants
         if (Math.random() > 0.96) {
-          ctx.fillStyle = "#ffffff"; // Neon bright front tips
+          ctx.fillStyle = "#ffffff";
         } else if (Math.random() > 0.4) {
-          ctx.fillStyle = "#38bdf8"; // Mid-tier glowing cyber cyan
+          ctx.fillStyle = "#38bdf8";
         } else {
-          ctx.fillStyle = "#0369a1"; // Hidden background trail streams
+          ctx.fillStyle = "#0369a1";
         }
 
         ctx.fillText(text, x, y);
@@ -193,7 +204,7 @@ function BinaryRainLoader() {
       }
     };
 
-    const interval = setInterval(draw, 30); // Hyper-smooth performance frame rate loop
+    const interval = setInterval(draw, 30);
 
     return () => {
       clearInterval(interval);
@@ -233,37 +244,45 @@ export default function Calculator() {
   const [iconRotation, setIconRotation] = useState(0);
   const [solarBars, setSolarBars] = useState(4);
 
-  const [quantumMode, setQuantumMode] = useState("default"); 
+  // Default straight to structural kill switch configuration
+  const [quantumMode, setQuantumMode] = useState("killed"); 
   const [pressTime, setPressTime] = useState(0);
 
-  // 🆕 Entry loader magic visibility state controls
   const [showLoading, setShowLoading] = useState(true);
   const [fadeLoading, setFadeLoading] = useState(false);
 
-  // Reusable audio tracks optimized for local public directories
-  const [clickAudio] = useState(() => new Audio("/click.mp3"));
+  // Local public asset buffers
+  const [clickAudio] = useState(() => {
+    return new Audio("/click.mp3");
+  });
   const [forestTrack] = useState(() => { 
     const a = new Audio("/forest.mp3"); 
-    a.loop = true; return a; 
+    a.loop = true; 
+    return a; 
   });
   const [rainTrack] = useState(() => { 
     const a = new Audio("/rain.mp3"); 
-    a.loop = true; return a; 
+    a.loop = true; 
+    return a; 
   });
 
   const t = themes[currentTheme];
 
-  // 🆕 Triggers the magic window dissolving transition sequence
+  // Entry loader transition timers
   useEffect(() => {
     const fadeTimer = setTimeout(() => {
-      setFadeLoading(true); // Engages alpha channel drop wrapper
+      setFadeLoading(true);
       const removeTimer = setTimeout(() => {
-        setShowLoading(false); // Unmounts loader cleanly from execution stack
+        setShowLoading(false);
       }, 800); 
-      return () => clearTimeout(removeTimer);
+      return () => {
+        clearTimeout(removeTimer);
+      };
     }, 2500); 
 
-    return () => clearTimeout(fadeTimer);
+    return () => {
+      clearTimeout(fadeTimer);
+    };
   }, []);
 
   // Global Audio Switch State Controller Loop
@@ -274,44 +293,88 @@ export default function Calculator() {
     } else {
       if (quantumMode === "forest") {
         rainTrack.pause();
-        forestTrack.play().catch(e => console.log("Audio pipeline waiting for gesture:", e));
+        forestTrack.play().catch((e) => {
+          console.log("Audio loop delayed:", e);
+        });
       } else if (quantumMode === "rain") {
         forestTrack.pause();
-        rainTrack.play().catch(e => console.log("Audio pipeline waiting for gesture:", e));
+        rainTrack.play().catch((e) => {
+          console.log("Audio loop delayed:", e);
+        });
       }
     }
   }, [quantumMode, isMuted, forestTrack, rainTrack]);
 
   useEffect(() => {
-    return () => {
-      forestTrack.pause();
-      rainTrack.pause();
+    return () => { 
+      forestTrack.pause(); 
+      rainTrack.pause(); 
     };
   }, [forestTrack, rainTrack]);
 
   useEffect(() => {
     const updateSolarPower = () => {
       const hours = new Date().getHours();
-      if (hours >= 6 && hours < 12) setSolarBars(4);       
-      else if (hours >= 12 && hours < 16) setSolarBars(3);  
-      else if (hours >= 16 && hours < 19) setSolarBars(2);  
-      else setSolarBars(0);                                 
+      if (hours >= 6 && hours < 12) {
+        setSolarBars(4);
+      } else if (hours >= 12 && hours < 16) {
+        setSolarBars(3);
+      } else if (hours >= 16 && hours < 19) {
+        setSolarBars(2);
+      } else {
+        setSolarBars(0);
+      }                                 
     };
     updateSolarPower();
     const interval = setInterval(updateSolarPower, 60000); 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+    };
   }, []);
 
   const toggleTheme = () => {
     playClickSound();
-    setIconRotation(prev => prev + 360);
-    setCurrentTheme(prev => (prev === "light" ? "dark" : "light"));
+    setIconRotation((prev) => {
+      return prev + 360;
+    });
+    setCurrentTheme((prev) => {
+      if (prev === "light") {
+        return "dark";
+      } else {
+        return "light";
+      }
+    });
+  };
+
+  const toggleMuteState = () => {
+    const nextMuteState = !isMuted;
+    setIsMuted(nextMuteState);
+    if (nextMuteState) {
+      clickAudio.pause();
+      forestTrack.pause();
+      rainTrack.pause();
+    } else {
+      if (quantumMode === "forest") {
+        forestTrack.play().catch((e) => {
+          console.log(e);
+        });
+      }
+      if (quantumMode === "rain") {
+        rainTrack.play().catch((e) => {
+          console.log(e);
+        });
+      }
+    }
   };
 
   const playClickSound = () => {
-    if (isMuted) return;
+    if (isMuted) {
+      return;
+    }
     clickAudio.currentTime = 0;
-    clickAudio.play().catch(err => console.log("Audio block context caught:", err));
+    clickAudio.play().catch((err) => {
+      console.log("Audio context blocked:", err);
+    });
   };
 
   const handleQuantumPressStart = () => {
@@ -319,7 +382,9 @@ export default function Calculator() {
   };
 
   const handleQuantumPressEnd = () => {
-    if (!pressTime) return;
+    if (!pressTime) {
+      return;
+    }
     const duration = Date.now() - pressTime;
     setPressTime(0);
 
@@ -328,7 +393,11 @@ export default function Calculator() {
       forestTrack.pause();
       if (!isMuted) {
         rainTrack.currentTime = 0;
-        rainTrack.play().then(() => console.log("Storm Synchronized")).catch(e => console.log("Audio error caught:", e));
+        rainTrack.play().then(() => {
+          console.log("Storm Active");
+        }).catch((e) => {
+          console.log("Audio track error:", e);
+        });
       }
       return;
     }
@@ -338,36 +407,63 @@ export default function Calculator() {
       rainTrack.pause();
       if (!isMuted) {
         forestTrack.currentTime = 0;
-        forestTrack.play().then(() => console.log("Forest Synchronized")).catch(e => console.log("Audio error caught:", e));
+        forestTrack.play().then(() => {
+          console.log("Forest Active");
+        }).catch((e) => {
+          console.log("Audio track error:", e);
+        });
       }
       return;
     }
 
-    if (quantumMode === "forest" || quantumMode === "rain" || quantumMode === "default") {
-      setQuantumMode("killed"); 
-      forestTrack.pause();
-      rainTrack.pause();
-    } else {
-      setQuantumMode("default"); 
-    }
+    setQuantumMode((prev) => {
+      if (prev === "killed") {
+        return "default";
+      } else {
+        return "killed";
+      }
+    });
+    forestTrack.pause();
+    rainTrack.pause();
     playClickSound();
   };
 
-  const handleNumberInput = (num) => { playClickSound(); handleNumber(num); };
-  const handleOperationInput = (op) => { playClickSound(); handleOperation(op); };
-  const handleClearInput = () => { playClickSound(); clearAll(); };
-  const handleEqualInput = () => { playClickSound(); calculate(); };
+  const handleNumberInput = (num) => { 
+    playClickSound(); 
+    handleNumber(num); 
+  };
+  
+  const handleOperationInput = (op) => { 
+    playClickSound(); 
+    handleOperation(op); 
+  };
+  
+  const handleClearInput = () => { 
+    playClickSound(); 
+    clearAll(); 
+  };
+  
+  const handleEqualInput = () => { 
+    playClickSound(); 
+    calculate(); 
+  };
 
   const evaluateExpression = (expr) => {
     let sanitized = expr.replace(/×/g, "*").replace(/÷/g, "/").replace(/²/g, "**2");
     const safeRegex = /^[0-9+\-*/().\s**]+$/;
-    if (!safeRegex.test(sanitized)) return "Error";
+    if (!safeRegex.test(sanitized)) {
+      return "Error";
+    }
     try {
       // eslint-disable-next-line no-new-func
       const result = new Function(`return (${sanitized})`)();
-      if (result === Infinity || isNaN(result)) return "Error";
+      if (result === Infinity || isNaN(result)) {
+        return "Error";
+      }
       return String(result);
-    } catch (e) { return "Error"; }
+    } catch (e) { 
+      return "Error"; 
+    }
   };
 
   const handleNumber = (num) => {
@@ -378,14 +474,19 @@ export default function Calculator() {
       setHistoryIndex(-1); 
     } else {
       const lastChar = display.slice(-1);
-      if (lastChar === ")" || lastChar === "²") setDisplay(display + " × " + num);
-      else setDisplay(display + num);
+      if (lastChar === ")" || lastChar === "²") {
+        setDisplay(display + " × " + num);
+      } else {
+        setDisplay(display + num);
+      }
     }
   };
 
   const handleOperation = (op) => {
     const prompts = ["a = ?", "b = ?", "c = ?"];
-    if (prompts.includes(display) || display === "Error" || display.includes("x")) return;
+    if (prompts.includes(display) || display === "Error" || display.includes("x")) {
+      return;
+    }
     const trimmed = display.trim();
     if (["+", "-", "×", "÷"].includes(trimmed.slice(-1))) {
       const tokens = trimmed.split(/\s+/);
@@ -401,7 +502,9 @@ export default function Calculator() {
   const handleParenthesis = (p) => {
     playClickSound();
     const prompts = ["a = ?", "b = ?", "c = ?"];
-    if (prompts.includes(display) || display === "Error") return;
+    if (prompts.includes(display) || display === "Error") {
+      return;
+    }
 
     if (display === "0" || resetOnNextInput || historyIndex !== -1) {
       setDisplay(p);
@@ -409,16 +512,23 @@ export default function Calculator() {
       setHistoryIndex(-1);
     } else {
       const lastChar = display.slice(-1);
-      if (p === "(" && /[0-9)³²]/.test(lastChar)) setDisplay(display + " × (");
-      else setDisplay(display + p);
+      if (p === "(" && /[0-9)³²]/.test(lastChar)) {
+        setDisplay(display + " × (");
+      } else {
+        setDisplay(display + p);
+      }
     }
   };
 
   const handleSquare = () => {
     playClickSound();
     const prompts = ["a = ?", "b = ?", "c = ?"];
-    if (prompts.includes(display) || display === "Error" || display === "0") return;
-    if (["+", "-", "×", "÷", "(", " "].includes(display.slice(-1))) return;
+    if (prompts.includes(display) || display === "Error" || display === "0") {
+      return;
+    }
+    if (["+", "-", "×", "÷", "(", " "].includes(display.slice(-1))) {
+      return;
+    }
     setDisplay(display + "²");
     setResetOnNextInput(false);
     setHistoryIndex(-1);
@@ -427,86 +537,159 @@ export default function Calculator() {
   const handleSquareRoot = () => {
     playClickSound();
     const prompts = ["a = ?", "b = ?", "c = ?"];
-    if (prompts.includes(display) || display === "Error") return;
+    if (prompts.includes(display) || display === "Error") {
+      return;
+    }
     const currentTotal = parseFloat(evaluateExpression(display));
-    if (isNaN(currentTotal) || currentTotal < 0) { setDisplay("Error"); } 
-    else {
+    if (isNaN(currentTotal) || currentTotal < 0) { 
+      setDisplay("Error"); 
+    } else {
       const result = Math.sqrt(currentTotal);
       setDisplay(String(result));
-      setHistory(prev => [...prev, `√(${display}) = ${result}`]);
+      setHistory((prev) => {
+        return [...prev, `√(${display}) = ${result}`];
+      });
       setHistoryIndex(-1);
     }
     setResetOnNextInput(true);
   };
 
   const startPolynomialSolver = () => {
-    playClickSound(); setPolyMode("a"); setDisplay("a = ?"); setResetOnNextInput(true);
+    playClickSound(); 
+    setPolyMode("a"); 
+    setDisplay("a = ?"); 
+    setResetOnNextInput(true);
   };
 
   const handleBackspace = () => {
     playClickSound();
     const prompts = ["a = ?", "b = ?", "c = ?"];
-    if (prompts.includes(display) || historyIndex !== -1 || display === "Error") return;
+    if (prompts.includes(display) || historyIndex !== -1 || display === "Error") {
+      return;
+    }
     const trimmed = display.trim();
     const tokens = trimmed.split(/\s+/);
     if (["+", "-", "×", "÷"].includes(tokens[tokens.length - 1])) {
       tokens.pop();
-      const nextString = tokens.join(" ");
-      setDisplay(nextString === "" ? "0" : nextString);
+      if (tokens.join(" ") === "") {
+        setDisplay("0");
+      } else {
+        setDisplay(tokens.join(" "));
+      }
     } else {
       if (display.length > 1) {
         let updated = display.slice(0, -1);
-        if (updated.slice(-1) === " ") updated = updated.trim();
-        setDisplay(updated === "" ? "0" : updated);
-      } else { setDisplay("0"); }
+        if (updated.slice(-1) === " ") {
+          updated = updated.trim();
+        }
+        if (updated === "") {
+          setDisplay("0");
+        } else {
+          setDisplay(updated);
+        }
+      } else { 
+        setDisplay("0"); 
+      }
     }
   };
 
   const calculate = () => {
-    if (polyMode === "a") { setPolyA(parseFloat(display)); setPolyMode("b"); setDisplay("b = ?"); setResetOnNextInput(true); return; }
-    if (polyMode === "b") { setPolyB(parseFloat(display)); setPolyMode("c"); setDisplay("c = ?"); setResetOnNextInput(true); return; }
+    if (polyMode === "a") { 
+      setPolyA(parseFloat(display)); 
+      setPolyMode("b"); 
+      setDisplay("b = ?"); 
+      setResetOnNextInput(true); 
+      return; 
+    }
+    if (polyMode === "b") { 
+      setPolyB(parseFloat(display)); 
+      setPolyMode("c"); 
+      setDisplay("c = ?"); 
+      setResetOnNextInput(true); 
+      return; 
+    }
     if (polyMode === "c") {
-      const c = parseFloat(display); const a = polyA; const b = polyB;
-      if (a === 0) { setDisplay("Invalid (a=0)"); setPolyMode(null); return; }
+      const c = parseFloat(display); 
+      const a = polyA; 
+      const b = polyB; 
+      if (a === 0) { 
+        setDisplay("Invalid (a=0)"); 
+        setPolyMode(null); 
+        return; 
+      }
       const discriminant = b * b - 4 * a * c;
       let resultStr = "";
       if (discriminant >= 0) {
         const root1 = (-b + Math.sqrt(discriminant)) / (2 * a);
         const root2 = (-b - Math.sqrt(discriminant)) / (2 * a);
-        resultStr = root1 === root2 ? `x = ${root1}` : `x1=${root1.toFixed(2)}, x2=${root2.toFixed(2)}`;
+        if (root1 === root2) {
+          resultStr = `x = ${root1}`;
+        } else {
+          resultStr = `x1=${root1.toFixed(2)}, x2=${root2.toFixed(2)}`;
+        }
       } else {
-        const realPart = (-b / (2 * a)).toFixed(2); const imagPart = (Math.sqrt(-discriminant) / (2 * a)).toFixed(2);
+        const realPart = (-b / (2 * a)).toFixed(2); 
+        const imagPart = (Math.sqrt(-discriminant) / (2 * a)).toFixed(2);
         resultStr = `x1=${realPart}+${imagPart}i, x2=${realPart}-${imagPart}i`;
       }
       setDisplay(resultStr);
-      setHistory(prev => [...prev, `${a}x² + ${b}x + ${c} = 0 → ${resultStr}`]);
-      setPolyMode(null); setPolyA(null); setPolyB(null); setHistoryIndex(-1); setResetOnNextInput(true); return;
+      setHistory((prev) => {
+        return [...prev, `${a}x² + ${b}x + ${c} = 0 → ${resultStr}`];
+      });
+      setPolyMode(null); 
+      setPolyA(null); 
+      setPolyB(null); 
+      setHistoryIndex(-1); 
+      setResetOnNextInput(true); 
+      return;
     }
 
     const currentExpression = display;
     const resultStr = evaluateExpression(currentExpression);
     setDisplay(resultStr);
     if (resultStr !== "Error" && currentExpression !== resultStr) {
-      setHistory(prev => [...prev, `${currentExpression.trim()} = ${resultStr}`]);
+      setHistory((prev) => {
+        return [...prev, `${currentExpression.trim()} = ${resultStr}`];
+      });
     }
-    setHistoryIndex(-1); setResetOnNextInput(true);
+    setHistoryIndex(-1); 
+    setResetOnNextInput(true);
   };
 
   const handleHistoryUp = () => {
-    playClickSound(); if (history.length === 0) return;
+    playClickSound(); 
+    if (history.length === 0) {
+      return;
+    }
     let newIndex = historyIndex === -1 ? history.length - 1 : historyIndex - 1;
-    if (newIndex >= 0) { setHistoryIndex(newIndex); setDisplay(history[newIndex]); }
+    if (newIndex >= 0) { 
+      setHistoryIndex(newIndex); 
+      setDisplay(history[newIndex]); 
+    }
   };
 
   const handleHistoryDown = () => {
-    playClickSound(); if (history.length === 0 || historyIndex === -1) return;
+    playClickSound(); 
+    if (history.length === 0 || historyIndex === -1) {
+      return;
+    }
     let newIndex = historyIndex + 1;
-    if (newIndex < history.length) { setHistoryIndex(newIndex); setDisplay(history[newIndex]); } 
-    else { setHistoryIndex(-1); setDisplay("0"); }
+    if (newIndex < history.length) { 
+      setHistoryIndex(newIndex); 
+      setDisplay(history[newIndex]); 
+    } else { 
+      setHistoryIndex(-1); 
+      setDisplay("0"); 
+    }
   };
 
   const clearAll = () => {
-    setDisplay("0"); setResetOnNextInput(false); setPolyMode(null); setPolyA(null); setPolyB(null); setHistoryIndex(-1);
+    setDisplay("0"); 
+    setResetOnNextInput(false); 
+    setPolyMode(null); 
+    setPolyA(null); 
+    setPolyB(null); 
+    setHistoryIndex(-1); 
   };
 
   const getQuantumIcon = () => {
@@ -517,9 +700,20 @@ export default function Calculator() {
       return <span style={{ display: "inline-block", animation: "bounceDrop 1.2s infinite ease-in-out", fontSize: "15px" }}>💧</span>;
     }
     
-    const strokeColor = quantumMode === "killed" 
-      ? (currentTheme === "light" ? "#94a3b8" : "#475569") 
-      : (currentTheme === "light" ? "#334155" : "#cbd5e1");
+    let strokeColor = "#cbd5e1";
+    if (quantumMode === "killed") {
+      if (currentTheme === "light") {
+        strokeColor = "#94a3b8";
+      } else {
+        strokeColor = "#475569";
+      }
+    } else {
+      if (currentTheme === "light") {
+        strokeColor = "#334155";
+      } else {
+        strokeColor = "#cbd5e1";
+      }
+    }
       
     return (
       <svg viewBox="0 0 24 24" width="18" height="18" style={{ animation: quantumMode === "killed" ? "none" : "spinAtom 6s infinite linear", display: "block" }}>
@@ -564,15 +758,20 @@ export default function Calculator() {
       };
     }
     
+    let boxS = "0px 2px 3px rgba(0,0,0,0.3)";
+    if (quantumMode === "killed") {
+      boxS = "inset 0px 2px 3px rgba(0,0,0,0.2)";
+    } else if (isLight) {
+      boxS = "0px 2px 3px rgba(0,0,0,0.1), inset 0px 1px 0px #ffffff";
+    }
+
     return {
       ...baseCircle,
       background: isLight 
         ? "linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%)" 
         : "linear-gradient(180deg, #334155 0%, #1e293b 100%)",
       border: "1px solid rgba(0,0,0,0.15)",
-      boxShadow: quantumMode === "killed"
-        ? "inset 0px 2px 3px rgba(0,0,0,0.2)"
-        : (isLight ? "0px 2px 3px rgba(0,0,0,0.1), inset 0px 1px 0px #ffffff" : "0px 2px 3px rgba(0,0,0,0.3)")
+      boxShadow: boxS
     };
   };
 
@@ -582,27 +781,54 @@ export default function Calculator() {
       if (/[0-9]/.test(e.key)) { 
         e.preventDefault(); 
         handleNumberInput(e.key); 
-      }
-      else if (e.key === "+") { e.preventDefault(); handleOperationInput("+"); }
-      else if (e.key === "-") { e.preventDefault(); handleOperationInput("-"); }
-      else if (e.key === "*") { e.preventDefault(); handleOperationInput("×"); }
-      else if (e.key === "/") { e.preventDefault(); handleOperationInput("÷"); }
-      else if (e.key === "9" && e.shiftKey) { e.preventDefault(); handleParenthesis("("); }
-      else if (e.key === "0" && e.shiftKey) { e.preventDefault(); handleParenthesis(")"); }
-      else if (e.key === "Enter" || e.key === "=") { e.preventDefault(); handleEqualInput(); }
-      else if (e.key === "Backspace") { e.preventDefault(); handleBackspace(); }
-      else if (e.key === "Escape") { e.preventDefault(); handleClearInput(); }
-      else if (e.key === ".") { 
+      } else if (e.key === "+") { 
+        e.preventDefault(); 
+        handleOperationInput("+"); 
+      } else if (e.key === "-") { 
+        e.preventDefault(); 
+        handleOperationInput("-"); 
+      } else if (e.key === "*") { 
+        e.preventDefault(); 
+        handleOperationInput("×"); 
+      } else if (e.key === "/") { 
+        e.preventDefault(); 
+        handleOperationInput("÷"); 
+      } else if (e.key === "9" && e.shiftKey) { 
+        e.preventDefault(); 
+        handleParenthesis("("); 
+      } else if (e.key === "0" && e.shiftKey) { 
+        e.preventDefault(); 
+        handleParenthesis(")"); 
+      } else if (e.key === "Enter" || e.key === "=") { 
+        e.preventDefault(); 
+        handleEqualInput(); 
+      } else if (e.key === "Backspace") { 
+        e.preventDefault(); 
+        handleBackspace(); 
+      } else if (e.key === "Escape") { 
+        e.preventDefault(); 
+        handleClearInput(); 
+      } else if (e.key === ".") { 
         e.preventDefault(); 
         playClickSound(); 
-        if (!display.includes(".")) setDisplay(prev => prev + "."); 
+        if (!display.includes(".")) {
+          setDisplay((prev) => {
+            return prev + ".";
+          });
+        }
+      } else if (e.key === "ArrowUp") { 
+        e.preventDefault(); 
+        handleHistoryUp(); 
+      } else if (e.key === "ArrowDown") { 
+        e.preventDefault(); 
+        handleHistoryDown(); 
       }
-      else if (e.key === "ArrowUp") { e.preventDefault(); handleHistoryUp(); }
-      else if (e.key === "ArrowDown") { e.preventDefault(); handleHistoryDown(); }
     };
 
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
     
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [display, polyMode, polyA, polyB, history, historyIndex, isMuted, resetOnNextInput, currentTheme, quantumMode]);
@@ -617,43 +843,43 @@ export default function Calculator() {
 
         /* HIGH-FIDELITY ANDROID RESPONSIVE SCALE ENGINE Overrides */
         @media (max-width: 500px) {
-          .calc-outer {
-            padding: 0 !important;
+          .calc-outer { 
+            padding: 0 !important; 
           }
           .calc-card {
-            width: 100% !important;
-            max-width: 100% !important;
-            height: 100vh !important;
+            width: 100% !important; 
+            max-width: 100% !important; 
+            height: 100vh !important; 
             border-radius: 0px !important;
-            border: none !important;
-            box-shadow: none !important;
-            padding: 16px 14px !important;
+            border: none !important; 
+            box-shadow: none !important; 
+            padding: 16px 14px !important; 
             box-sizing: border-box !important;
-            display: flex !important;
+            display: flex !important; 
             flex-direction: column !important;
           }
-          .lcd-screen {
-            height: 90px !important;
-            max-height: 90px !important;
-            font-size: 42px !important;
+          .lcd-screen { 
+            height: 90px !important; 
+            max-height: 90px !important; 
+            font-size: 42px !important; 
             margin-top: auto !important; 
-            margin-bottom: 18px !important;
+            margin-bottom: 18px !important; 
           }
-          .keypad-matrix {
-            display: grid !important;
+          .keypad-matrix { 
+            display: grid !important; 
             grid-template-rows: repeat(6, 1fr) !important; 
-            gap: 12px 10px !important;
+            gap: 12px 10px !important; 
             height: 62vh !important; 
           }
-          .calc-btn {
-            height: 100% !important;
-            font-size: 24px !important;
-            border-radius: 15px !important;
+          .calc-btn { 
+            height: 100% !important; 
+            font-size: 24px !important; 
+            border-radius: 15px !important; 
             touch-action: manipulation !important; 
           }
-          .system-zone {
-            gap: 10px !important;
-            padding: 6px 4px !important;
+          .system-zone { 
+            gap: 10px !important; 
+            padding: 6px 4px !important; 
           }
         }
       `}</style>
@@ -689,9 +915,17 @@ export default function Calculator() {
             <button
               onMouseDown={handleQuantumPressStart} 
               onMouseUp={handleQuantumPressEnd} 
-              onMouseLeave={() => setPressTime(0)} 
-              onTouchStart={(e) => { e.preventDefault(); handleQuantumPressStart(); }} 
-              onTouchEnd={(e) => { e.preventDefault(); handleQuantumPressEnd(); }}
+              onMouseLeave={() => {
+                setPressTime(0);
+              }} 
+              onTouchStart={(e) => { 
+                e.preventDefault(); 
+                handleQuantumPressStart(); 
+              }} 
+              onTouchEnd={(e) => { 
+                e.preventDefault(); 
+                handleQuantumPressEnd(); 
+              }}
               style={{ width: "28px", height: "28px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", userSelect: "none", transition: "all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1)", ...getQuantumBtnStyle() }}
             >
               {getQuantumIcon()}
@@ -708,10 +942,7 @@ export default function Calculator() {
           whiteSpace: "nowrap", overflowX: "hidden", boxSizing: "border-box"
         }}>
           <span>{display}</span>
-          <span style={{
-            display: "inline-block", width: "3px", height: "22px", backgroundColor: t.displayText, marginLeft: "3px",
-            animation: "blinkCursor 1s steps(2, start) infinite", verticalAlign: "middle"
-          }} />
+          <span style={{ display: "inline-block", width: "3px", height: "22px", backgroundColor: t.displayText, marginLeft: "3px", animation: "blinkCursor 1s steps(2, start) infinite", verticalAlign: "middle" }} />
         </div>
 
         <div style={{ display: "flex", justifyContent: "flex-end", color: t.controlText, fontSize: "9px", fontWeight: "800", letterSpacing: "0.6px", marginBottom: "6px", paddingRight: "4px" }}>
@@ -762,7 +993,7 @@ export default function Calculator() {
 
         {/* --- PANEL BASE UTILITY FOOTER --- */}
         <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "24px", marginTop: "22px", borderTop: `1px solid ${currentTheme === "light" ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.1)"}`, paddingTop: "14px" }}>
-          <button onClick={() => setIsMuted(!isMuted)} style={{ backgroundColor: "transparent", border: "none", color: t.controlText, fontSize: "14px", fontWeight: "700", cursor: "pointer", width: "110px", textAlign: "center" }}>
+          <button onClick={toggleMuteState} style={{ backgroundColor: "transparent", border: "none", color: t.controlText, fontSize: "14px", fontWeight: "700", cursor: "pointer", width: "110px", textAlign: "center" }}>
             {isMuted ? "🔈 Muted" : "🔊 Sound On"}
           </button>
           <div style={{ width: "1px", height: "14px", backgroundColor: currentTheme === "light" ? "#cbd5e1" : "#475569" }} />
@@ -773,19 +1004,9 @@ export default function Calculator() {
 
       </div>
 
-      {/* 🆕 Full-Screen Intercepting Binary Loading Overlay Matrix */}
+      {/* Full-Screen Intercepting Binary Loading Overlay Matrix */}
       {showLoading && (
-        <div style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: "100vw",
-          height: "100vh",
-          zIndex: 99999,
-          pointerEvents: "none", // Bypasses click blocks during matrix animation stream
-          opacity: fadeLoading ? 0 : 1,
-          transition: "opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1)" // Smooth magical fade out reveal
-        }}>
+        <div style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", zIndex: 99999, pointerEvents: "none", opacity: fadeLoading ? 0 : 1, transition: "opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1)" }}>
           <BinaryRainLoader />
         </div>
       )}
